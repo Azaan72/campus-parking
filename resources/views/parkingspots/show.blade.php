@@ -18,7 +18,7 @@
                 Bewerken
             </a>
 
-            <form method="POST" action="{{ route('parkingspots.destroy', $parkingSpot->id) }}" onsubmit="return confirm('Weet je zeker dat je deze parking spot wilt verwijderen?');">
+            <form method="POST" action="{{ route('parkingspots.destroy', $parkingspot->id) }}" onsubmit="return confirm('Weet je zeker dat je deze parking spot wilt verwijderen?');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="text-red-600 hover:text-red-800 font-medium transition-colors duration-200">

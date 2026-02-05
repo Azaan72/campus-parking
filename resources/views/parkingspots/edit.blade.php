@@ -2,7 +2,7 @@
     <div class="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
         <h1 class="text-3xl font-bold mb-6 text-center">Parking Spot bewerken</h1>
 
-        <form action="{{ route('parkingspots.update', $parkingspot->id) }}" method="POST" class="space-y-4">
+        <form action="{{ route('parkingspots.update', $parkingspot) }}" method="POST" class="space-y-4">
             @csrf
             @method('PUT')
 
