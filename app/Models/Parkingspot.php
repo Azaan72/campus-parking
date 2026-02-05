@@ -6,5 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Parkingspot extends Model
 {
-    //
+    protected $fillable = ['location', 'type', 'status', 'vehicle_fuel_type'];
+
 }
