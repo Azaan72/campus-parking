@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('location');
             $table->enum('type', ['normal', 'electric', 'disabled', 'compact']);
-            $table->enum('status', ['available', 'occupied', 'maintenance']);
+            $table->enum('status', ['available', 'occupied', 'maintenance', 'reserved']);
             $table->enum('vehicle_fuel_type', ['petrol', 'diesel', 'electric', 'hybrid']);
             $table->timestamps();
         });
