@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parkingspot', function (Blueprint $table) {
+        Schema::create('parkingspots', function (Blueprint $table) {
             $table->id();
+            $table->string('location');
+            $table->enum('type', ['normal', 'electric', 'disabled', 'compact']);
+            $table->enum('status', ['available', 'occupied', 'maintenance']);
+            $table->enum('vehicle_fuel_type', ['petrol', 'diesel', 'electric', 'hybrid']);
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parkingspot');
+        Schema::dropIfExists('parkingspots');
     }
 };
