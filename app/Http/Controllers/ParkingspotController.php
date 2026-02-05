@@ -16,11 +16,10 @@ class ParkingspotController extends Controller
         return view('parkingspots.index', compact('title', 'parkingspots'));
     }
 
-    public function show($id)
+    public function show(Parkingspot $parkingspot)
     {
-        $parkingspots = Parkingspot::findOrFail($id);
 
-        return view('parkingspots.show', compact('parkingspots'));
+        return view('parkingspots.show', compact('parkingspot'));
     }
 
     public function create()
@@ -28,29 +27,39 @@ class ParkingspotController extends Controller
         return view('parkingspots.create');
     }
 
-    public function store(ParkingSpotStoreRequest $request, Parkingspot $parkingspots)
+    // STORE
+    public function store(ParkingSpotStoreRequest $request)
     {
-        $parkingspots = new Parkingspot();
-        $parkingspots->parkingspot_name = $request->input('parkingspot_name');
-        $parkingspots->save();
+        $parkingspot = Parkingspot::create([
+            'location' => $request->input('location'),
+            'type' => $request->input('type'),
+            'status' => $request->input('status'),
+            'vehicle_fuel_type' => $request->input('vehicle_fuel_type'),
+        ]);
 
-        return redirect()->route('parkingspots.index');
+        return redirect()->route('parkingspots.index')
+            ->with('success', 'Parking spot succesvol aangemaakt.');
     }
 
-    public function update(ParkingSpotUpdateRequest $request, Parkingspot $parkingspots)
+    // UPDATE
+    public function update(ParkingSpotUpdateRequest $request, Parkingspot $parkingspot)
     {
+        $parkingspot->update([
+            'location' => $request->input('location'),
+            'type' => $request->input('type'),
+            'status' => $request->input('status'),
+            'vehicle_fuel_type' => $request->input('vehicle_fuel_type'),
+        ]);
 
-        $parkingspots->parkingspot_name = $request->input('parkingspot_name');
-        $parkingspots->save();
 
-        return redirect()->route('parkingspots.show', ['parkingspots' => $parkingspots->id]);
+        return redirect()->route('parkingspots.show', $parkingspot)
+            ->with('success', 'Parking spot succesvol bijgewerkt.');
     }
 
-    public function edit($id)
+    public function edit(Parkingspot $parkingspot)
     {
-        $parkingspots = Parkingspot::findOrFail($id);
 
-        return view('parkingspots.edit')->with('status', 'Parkingspot succesvol bijgewerkt.')->with('parkingspots', $parkingspots);
+        return view('parkingspots.edit')->with('status', 'Parkingspot succesvol bijgewerkt.')->with('parkingspot', $parkingspot);
     }
 
     public function destroy($id)
