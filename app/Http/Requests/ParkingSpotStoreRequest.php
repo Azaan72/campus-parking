@@ -22,11 +22,10 @@ class ParkingSpotStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'parkingspot_name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'type' => 'required|string|in:normal,electric,disabled,compact',
-            'status' => 'required|string|in:available,occupied,maintenance',
-            'vehicle_fuel_type' => 'required|string|in:petrol,diesel,eqlectric,hybrid',
+            'status' => 'required|string|in:available,occupied,maintenance,reserved',
+            'vehicle_fuel_type' => 'required|string|in:petrol,diesel,electric,hybrid',
         ];
     }
 }
