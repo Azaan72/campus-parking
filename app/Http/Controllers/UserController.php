@@ -66,6 +66,7 @@ class UserController extends Controller
             'city' => $request->input('city'),
             'country' => $request->input('country'),
         ]);
+        $user->password = bcrypt($request->input('password'));
 
 
         return redirect()->route('users.show', $user)
