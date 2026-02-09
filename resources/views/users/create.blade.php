@@ -58,16 +58,7 @@
             >
         </div>
 
-        {{-- Password --}}
-        <div>
-            <label class="block font-semibold">Password</label>
-            <input
-                type="password"
-                name="password"
-                class="border rounded w-full p-2"
-                required
-            >
-        </div>
+ 
 
         {{-- Phone number --}}
         <div>
