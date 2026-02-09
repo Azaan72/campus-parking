@@ -6,12 +6,9 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
-
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+
     public function run(): void
     {
         $users = [
@@ -27,6 +24,7 @@ class UserSeeder extends Seeder
                 'phone_number' => '+31612345678',
                 'email' => 'john.doe@example.com',
                 'password' => bcrypt('password123'), // encrypt wachtwoord
+                'role' => 'admin', // ✅ role toegevoegd
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -42,6 +40,7 @@ class UserSeeder extends Seeder
                 'phone_number' => '+31623456789',
                 'email' => 'jane.smith@example.com',
                 'password' => bcrypt('password123'),
+                'role' => 'user', // ✅ role toegevoegd
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -57,6 +56,7 @@ class UserSeeder extends Seeder
                 'phone_number' => '+31634567890',
                 'email' => 'mark.johnson@example.com',
                 'password' => bcrypt('password123'),
+                'role' => 'user', // ✅ role toegevoegd
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -72,6 +72,7 @@ class UserSeeder extends Seeder
                 'phone_number' => '+31645678901',
                 'email' => 'lisa.devries@example.com',
                 'password' => bcrypt('password123'),
+                'role' => 'user', // ✅ role toegevoegd
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -87,6 +88,7 @@ class UserSeeder extends Seeder
                 'phone_number' => '+31656789012',
                 'email' => 'tom.bakker@example.com',
                 'password' => bcrypt('password123'),
+                'role' => 'admin', // ✅ role toegevoegd
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
