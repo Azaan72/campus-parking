@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('reservation', function (Blueprint $table) {
             $table->id();
+            $table->string('status_of_reservation');
+            $table->datetime('date_time');
+            $table->string('type_reservation');
+
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('parking_spot_id')->constrained('parking_spot')->onDelete('cascade');
+            $table->foreignId('vehicle_id')->constrained('vehicle')->onDelete('cascade');
             $table->timestamps();
         });
     }
