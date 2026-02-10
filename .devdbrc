@@ -2,5 +2,9 @@
   {
     "type": "sqlite",
     "path": "c:\\Users\\ayazy\\Herd\\campus-parking\\database\\database.sqlite"
+  },
+  {
+    "type": "sqlite",
+    "path": "c:\\Users\\marri\\Herd\\campus-parking\\database\\database.sqlite"
   }
 ]
