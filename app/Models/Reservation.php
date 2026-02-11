@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reservation extends Model
 {
-    protected $table = 'reservation';
-
     protected $fillable = [
         'status_of_reservation',
         'date_time',
