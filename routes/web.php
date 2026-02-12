@@ -25,3 +25,4 @@ require __DIR__.'/parkingspot.php';
 require __DIR__.'/user.php';
 require __DIR__.'/vehicle.php';
 require __DIR__.'/reservation.php';
+require __DIR__.'/map.php';
