@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reservation;
+use App\Models\ParkingSpot;
+use App\Models\Vehicle;
+use App\Models\User;
 
 class ReservationController extends Controller
 {
@@ -16,12 +19,24 @@ class ReservationController extends Controller
 
     public function show(Reservation $reservation)
     {
+        $reservation->load('user', 'parkingSpot', 'vehicle');
         return view('reservations.show', compact('reservation'));
     }
 
     public function create()
     {
-        return view('reservations.create');
+        $parkingSpots = ParkingSpot::all();
+        $vehicles = Vehicle::all();
+        $users = User::all();
+        return view('reservations.create', compact('parkingSpots', 'vehicles', 'users'));
+    }
+
+    public function edit(Reservation $reservation)
+    {
+        $parkingSpots = ParkingSpot::all();
+        $vehicles = Vehicle::all();
+        $users = User::all();
+        return view('reservations.edit', compact('reservation', 'parkingSpots', 'vehicles', 'users'));
     }
 
     public function store(Request $request)
@@ -39,10 +54,6 @@ class ReservationController extends Controller
             ->with('success', 'Reservation succesvol aangemaakt.');
     }
 
-    public function edit(Reservation $reservation)
-    {
-        return view('reservations.edit', compact('reservation'));
-    }
 
     public function update(Request $request, Reservation $reservation)
     {
