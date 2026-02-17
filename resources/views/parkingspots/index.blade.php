@@ -1,4 +1,14 @@
 <x-base-layout>
+<form method="GET" action="{{ route('parkingspots.index') }}">
+    <select name="type" onchange="this.form.submit()">
+        <option value="">Alle types</option>
+        <option value="normal"   {{ $type == 'normal'   ? 'selected' : '' }}>Normal</option>
+        <option value="electric" {{ $type == 'electric' ? 'selected' : '' }}>Elektric</option>
+        <option value="disabled" {{ $type == 'disabled' ? 'selected' : '' }}>Disabled</option>
+        <option value="compact"  {{ $type == 'compact'  ? 'selected' : '' }}>Compact</option>
+    </select>
+</form>
+
     <div class="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
         {{-- Header --}}
         <div class="flex justify-between items-center mb-6">
