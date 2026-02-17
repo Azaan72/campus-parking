@@ -9,11 +9,14 @@ use Illuminate\Http\Request;
 
 class ParkingspotController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $title = 'Parking Spots';
-        $parkingspots = Parkingspot::all();
-        return view('parkingspots.index', compact('title', 'parkingspots'));
+        $type = $request->get('type');
+
+        $parkingspots = Parkingspot::when($type, fn($q) => $q->byType($type))->get();
+
+        return view('parkingspots.index', compact('title', 'parkingspots', 'type'));
     }
 
     public function show(Parkingspot $parkingspot)
