@@ -78,4 +78,20 @@ class ReservationController extends Controller
             ->with('success', 'Reservation succesvol verwijderd.');
     }
 
+
+
+   public function cancel(Reservation $reservation)
+{
+    if (\Carbon\Carbon::parse($reservation->date_time)->isPast()) {
+        return back()->with('error', 'Je kan een reservering niet annuleren na de ingangsdatum.');
+    }
+
+    $reservation->update(['status_of_reservation' => 'cancelled']);
+
+    if ($reservation->parkingSpot) {
+        $reservation->parkingSpot->update(['is_available' => true]);
+    }
+
+    return back()->with('success', 'Reservering succesvol geannuleerd.');
+}
 }
