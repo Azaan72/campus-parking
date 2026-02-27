@@ -16,6 +16,13 @@
             </div>
         @endif
 
+        {{-- Error message --}}
+        @if(session('error'))
+            <div class="mb-4 p-3 bg-red-100 text-red-800 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
         {{-- Reservations Table --}}
         <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -78,6 +85,19 @@
                                         Delete
                                     </button>
                                 </form>
+
+                                @if($reservation->status_of_reservation !== 'cancelled' && \Carbon\Carbon::parse($reservation->date_time)->isFuture())
+                                    <form action="{{ route('reservations.cancel', $reservation) }}"
+                                          method="POST"
+                                          class="inline-block"
+                                          onsubmit="return confirm('Weet je zeker dat je deze reservering wilt annuleren?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-orange-600 hover:underline">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty

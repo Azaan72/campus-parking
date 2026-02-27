@@ -42,6 +42,12 @@
                     Parking Spots
                 </a>
 
+            <nav class="flex gap-4">
+                <a href="{{ route('reservations.index') }}"
+                class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-950 font-semibold shadow-xl hover:scale-105 hover:shadow-2xl transition duration-300">
+                    Make a new Reservation
+                </a>
+
                 <a href="{{ route('users.index') }}"
                 class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-950 font-semibold shadow-xl hover:scale-105 hover:shadow-2xl transition duration-300">
                     Users
