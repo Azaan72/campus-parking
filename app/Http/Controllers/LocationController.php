@@ -29,6 +29,7 @@ class LocationController extends Controller
 
     public function create()
     {
+
         return view('locations.create');
     }
 
@@ -36,19 +37,25 @@ class LocationController extends Controller
     public function store(LocationStoreRequest $request)
     {
         $location = Location::create([
-            'location' => $request->input('location'),
+            'location_name' => $request->input('location_name'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'type' => $request->input('type'), // type kan optioneel blijven
         ]);
-
 
         return redirect()->route('locations.index')
             ->with('success', 'Location succesvol aangemaakt.');
+
     }
 
     // UPDATE
     public function update(LocationUpdateRequest $request, Location $location)
     {
         $location->update([
-            'location' => $request->input('location'),
+            'location_name' => $request->input('location_name'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'type' => $request->input('type'),
         ]);
 
 

@@ -36,12 +36,26 @@
                 @foreach($locations as $location)
                     <tr>
                         <td class="p-2 border">{{ $location->id }}</td>
-                        <td class="p-2 border">{{ $location->location }}</td>
-                        <td class="p-2 border">
+                        <td class="p-2 border">{{ $location->location_name }}</td>
+                        <td class="p-2 border space-x-2">
+
+                            {{-- Show button --}}
+                            <a href="{{ route('locations.show', $location) }}"
+                            class="text-blue-600 hover:underline">
+                                Show
+                            </a>
+
+                            {{-- Edit button --}}
+                            <a href="{{ route('locations.edit', $location) }}"
+                            class="text-yellow-600 hover:underline">
+                                Edit
+                            </a>
+
+                            {{-- Delete button --}}
                             <form action="{{ route('locations.destroy', $location) }}"
-                                  method="POST"
-                                  class="inline-block"
-                                  onsubmit="return confirm('Weet je zeker dat je deze location wilt verwijderen?');">
+                                method="POST"
+                                class="inline-block"
+                                onsubmit="return confirm('Weet je zeker dat je deze location wilt verwijderen?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:underline">

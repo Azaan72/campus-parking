@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('location_name');
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            $table->enum('type', ['free', 'paid', 'permit']);
+            $table->enum('type', ['free', 'paid', 'permit'])->nullable();
             $table->timestamps();
         });
     }
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('location');
+        Schema::dropIfExists('locations');
     }
 };
  
