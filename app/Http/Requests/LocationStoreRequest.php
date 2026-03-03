@@ -22,7 +22,7 @@ class LocationStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'location_name' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
         ];
     }
 }
