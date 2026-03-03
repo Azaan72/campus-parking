@@ -69,4 +69,5 @@ class LocationController extends Controller
         return redirect()->route('locations.index')
             ->with('success', 'Location succesvol verwijderd.');
     }
+    
 }
