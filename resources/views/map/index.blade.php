@@ -150,6 +150,65 @@
 
     let startMarker, endMarker, routeLine;
 
+    // ── Custom P marker icon per parking type ──
+    function parkingIcon(type) {
+        const colors = { free: '#28a745', paid: '#e6a817', permit: '#007bff' };
+        const color  = colors[type] || '#667eea';
+        return L.divIcon({
+            className: '',
+            html: `<div style="
+                background:${color};
+                color:white;
+                font-weight:800;
+                font-size:14px;
+                width:34px;height:34px;
+                border-radius:50% 50% 50% 0;
+                transform:rotate(-45deg);
+                display:flex;align-items:center;justify-content:center;
+                box-shadow:0 3px 10px rgba(0,0,0,0.3);
+                border:2px solid white;
+            "><span style="transform:rotate(45deg)">P</span></div>`,
+            iconSize:   [34, 34],
+            iconAnchor: [17, 34],
+            popupAnchor:[0, -36]
+        });
+    }
+
+    // ── Place a marker for every parking option in the dropdown on load ──
+    const typeLabel = { free: '✅ Free', paid: '💰 Paid', permit: '🔒 Permit' };
+    const bounds = [];
+
+    document.querySelectorAll('#endLocation option[data-lat]').forEach(opt => {
+        const lat  = parseFloat(opt.dataset.lat);
+        const lng  = parseFloat(opt.dataset.lng);
+        const type = opt.dataset.type;
+        const name = opt.textContent.trim();
+        if(isNaN(lat) || isNaN(lng)) return;
+
+        const marker = L.marker([lat, lng], { icon: parkingIcon(type) }).addTo(map);
+        marker.bindPopup(`
+            <strong style="font-size:1em">${name}</strong><br>
+            <span style="font-size:0.85em;color:#666">${typeLabel[type] || ''}</span>
+        `);
+
+        // Clicking the marker also selects it in the dropdown
+        marker.on('click', () => {
+            const sel = document.getElementById('endLocation');
+            for(let i = 0; i < sel.options.length; i++){
+                if(sel.options[i].value === opt.value){
+                    sel.selectedIndex = i;
+                    onParkingSelect();
+                    break;
+                }
+            }
+        });
+
+        bounds.push([lat, lng]);
+    });
+
+    // Fit map to show all parking markers if any exist
+    if(bounds.length > 0) map.fitBounds(bounds, { padding: [40, 40] });
+
     function onParkingSelect(){
         const sel   = document.getElementById('endLocation');
         const badge = document.getElementById('parkingBadge');
