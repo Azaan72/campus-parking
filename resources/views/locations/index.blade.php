@@ -23,15 +23,35 @@
             </div>
         @endif
 
-        <form action="{{ route('citys.destroy', $city) }}"
-              method="POST"
-              class="inline-block"
-              onsubmit="return confirm('Weet je zeker dat je deze city wilt verwijderen?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="text-red-600 hover:underline">
-                Delete
-            </button>
-        </form>
+        {{-- Locations table --}}
+        <table class="w-full border border-gray-200 rounded">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="p-2 border">ID</th>
+                    <th class="p-2 border">Location</th>
+                    <th class="p-2 border">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($locations as $location)
+                    <tr>
+                        <td class="p-2 border">{{ $location->id }}</td>
+                        <td class="p-2 border">{{ $location->location }}</td>
+                        <td class="p-2 border">
+                            <form action="{{ route('locations.destroy', $location) }}"
+                                  method="POST"
+                                  class="inline-block"
+                                  onsubmit="return confirm('Weet je zeker dat je deze location wilt verwijderen?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:underline">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </x-base-layout>

@@ -6,8 +6,8 @@
             @csrf
 
             <div>
-                <label for="city" class="block text-sm font-medium text-gray-700">Location Name</label>
-                <input type="text" name="city" id="city" required
+                <label for="location" class="block text-sm font-medium text-gray-700">Location Name</label>
+                <input type="text" name="location" id="location" required
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
