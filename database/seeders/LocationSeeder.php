@@ -14,11 +14,11 @@ class LocationSeeder extends Seeder
     public function run(): void
     {
         $locations = [
-            ['location_name' => 'Amsterdam'],
-            ['location_name' => 'Rotterdam'],
-            ['location_name' => 'Utrecht'],
-            ['location_name' => 'Eindhoven'],
-            ['location_name' => 'Groningen'],
+            ['location' => 'Amsterdam'],
+            ['location' => 'Rotterdam'],
+            ['location' => 'Utrecht'],
+            ['location' => 'Eindhoven'],
+            ['location' => 'Groningen'],
         ];
 
         Location::insert($locations);
