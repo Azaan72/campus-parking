@@ -47,7 +47,7 @@
                 </select>
             </div>
 
-            {{-- User Dropdown --}}
+                    {{-- User Dropdown --}}
             <div>
                 <label class="block font-semibold mb-1">User</label>
                 <select name="user_id"
@@ -57,7 +57,7 @@
                     @foreach($users as $user)
                         <option value="{{ $user->id }}"
                             @selected(old('user_id') == $user->id)>
-                            {{ $user->name }}
+                            {{ $user->firstname }} {{ $user->lastname }}
                         </option>
                     @endforeach
                 </select>
