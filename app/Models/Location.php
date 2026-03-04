@@ -15,4 +15,3 @@ class Location extends Model
         'type'
     ];
 }
-
