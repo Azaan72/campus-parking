@@ -17,12 +17,12 @@ return new class extends Migration
             $table->string('lastname');
             $table->string('prefix')->nullable();
 
-            $table->string('city');
-            $table->string('streetname');
-            $table->string('house_number');
-            $table->string('zipcode');
-            $table->string('country');
-            $table->string('phone_number');
+            $table->string('city')->nullable();
+            $table->string('streetname')->nullable();
+            $table->string('house_number')->nullable();
+            $table->string('zipcode')->nullable();
+            $table->string('country')->nullable();
+            $table->string('phone_number')->nullable();
             $table->string('role')->default('user');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
