@@ -15,6 +15,11 @@ class Reservation extends Model
         'vehicle_id',
     ];
 
+    // ✅ Dit toevoegen
+    protected $casts = [
+        'date_time' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
