@@ -162,142 +162,152 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    const map = L.map('map').setView([52.1,5.1],13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
-    let startM, endM, routeL;
-    const pad = n => String(n).padStart(2,'0');
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            // --- Kaart setup ---
+            const map = L.map('map').setView([52.1, 5.1], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-    // Set datetime min to now
-    const now = new Date();
-    const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    Object.assign(document.getElementById('arrivalTime'), {min:local, value:local});
+            let startM, endM, routeL;
+            const pad = n => String(n).padStart(2, '0');
 
-    function parkingIcon(type) {
-        const colors = {free:'#28a745', paid:'#e6a817', permit:'#007bff'};
-        const color = colors[type] || '#667eea';
-        return L.divIcon({ className:'', iconSize:[34,34], iconAnchor:[17,34], popupAnchor:[0,-36],
-            html:`<div style="background:${color};color:white;font-weight:800;font-size:14px;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.3);border:2px solid white"><span style="transform:rotate(45deg)">P</span></div>` });
-    }
+            // --- Datum op huidige tijd zetten ---
+            const now = new Date();
+            const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            Object.assign(document.getElementById('arrivalTime'), { min: local, value: local });
 
-    const bounds = [];
-    document.querySelectorAll('#endLocation option[data-lat]').forEach(opt => {
-        const lat=parseFloat(opt.dataset.lat), lng=parseFloat(opt.dataset.lng);
-        if(isNaN(lat)||isNaN(lng)) return;
-        const m = L.marker([lat,lng],{icon:parkingIcon(opt.dataset.type)}).addTo(map);
-        m.bindPopup(`<strong>${opt.textContent.trim()}</strong><br><span style="font-size:.82em;color:#666">${{free:'✅ Free',paid:'💰 Paid',permit:'🔒 Permit'}[opt.dataset.type]||''}</span>`);
-        m.on('click',()=>{ const s=document.getElementById('endLocation'); for(let i=0;i<s.options.length;i++) if(s.options[i].value===opt.value){s.selectedIndex=i;onParkingSelect();break;} });
-        bounds.push([lat,lng]);
-    });
-    if(bounds.length) map.fitBounds(bounds,{padding:[40,40]});
-
-    function onParkingSelect(){
-        const sel=document.getElementById('endLocation'), badge=document.getElementById('parkingBadge');
-        const type=sel.options[sel.selectedIndex]?.dataset?.type;
-        badge.className='parking-badge badge-hidden'; badge.textContent='';
-        if(type==='free')  {badge.className='parking-badge badge-free';  badge.textContent='✅ Free';}
-        if(type==='paid')  {badge.className='parking-badge badge-paid';  badge.textContent='💰 Paid';}
-        if(type==='permit'){badge.className='parking-badge badge-permit';badge.textContent='🔒 Permit Required';}
-    }
-
-    function wEmoji(c){ return c===0?'☀️':c<=3?'⛅':c<=49?'🌫️':c<=67?'🌧️':c<=77?'❄️':c<=82?'🌦️':'⛈️'; }
-
-    async function calculateRoute() {
-            const addr  = document.getElementById('startLocation').value.trim();
-            const sel   = document.getElementById('endLocation');
-            const locId = sel.value;
-            const dtVal = document.getElementById('arrivalTime').value;
-
-            if (!addr || !locId) { alert('Vul zowel startlocatie als parking in'); return; }
-
-            const sp = document.getElementById('spinner');
-            sp.classList.add('active');
-
-            try {
-                const res = await fetch('/maps/route', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                    body: JSON.stringify({ address: addr, location_id: locId, arrival: dtVal }),
+            // --- Parkeer icoon per type ---
+            function parkingIcon(type) {
+                const color = { free: '#28a745', paid: '#e6a817', permit: '#007bff' }[type] || '#667eea';
+                return L.divIcon({
+                    className: '', iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -36],
+                    html: `<div style="background:${color};color:white;font-weight:800;font-size:14px;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.3);border:2px solid white"><span style="transform:rotate(45deg)">P</span></div>`
                 });
+            }
 
-                const data = await res.json();
-                if (!res.ok) { alert(data.error || 'Er ging iets mis.'); return; }
+            // --- Weer emoji op basis van weercode ---
+            function wEmoji(c) {
+                if (c === 0)  return '☀️';
+                if (c <= 3)   return '⛅';
+                if (c <= 49)  return '🌫️';
+                if (c <= 67)  return '🌧️';
+                if (c <= 77)  return '❄️';
+                if (c <= 82)  return '🌦️';
+                return '⛈️';
+            }
 
-                // Verwijder oude lagen
-                if (startM) map.removeLayer(startM);
-                if (endM)   map.removeLayer(endM);
-                if (routeL) map.removeLayer(routeL);
+            // --- Parkeermarkers op kaart zetten ---
+            const bounds = [];
+            document.querySelectorAll('#endLocation option[data-lat]').forEach(opt => {
+                const lat = parseFloat(opt.dataset.lat), lng = parseFloat(opt.dataset.lng);
+                if (isNaN(lat) || isNaN(lng)) return;
 
-                // Zet markers
-                startM = L.marker([data.start.lat, data.start.lng])
-                        .addTo(map).bindPopup('<strong>Start</strong>');
-                endM   = L.marker([data.location.lat, data.location.lng], { icon: parkingIcon(data.location.type) })
-                        .addTo(map).bindPopup(`<strong>${data.location.name}</strong>`);
+                const labels = { free: '✅ Free', paid: '💰 Paid', permit: '🔒 Permit' };
+                L.marker([lat, lng], { icon: parkingIcon(opt.dataset.type) })
+                    .addTo(map)
+                    .bindPopup(`<strong>${opt.textContent.trim()}</strong><br><span style="font-size:.82em;color:#666">${labels[opt.dataset.type] || ''}</span>`)
+                    .on('click', () => {
+                        const sel = document.getElementById('endLocation');
+                        for (let i = 0; i < sel.options.length; i++) {
+                            if (sel.options[i].value === opt.value) { sel.selectedIndex = i; onParkingSelect(); break; }
+                        }
+                    });
+                bounds.push([lat, lng]);
+            });
+            if (bounds.length) map.fitBounds(bounds, { padding: [40, 40] });
 
-                // Teken route
-                routeL = L.polyline(data.route.coordinates.map(c => [c[1], c[0]]), { color: '#667eea', weight: 5 }).addTo(map);
-                map.fitBounds(routeL.getBounds(), { padding: [50, 50] });
+            // --- Badge tonen bij selectie parking ---
+            function onParkingSelect() {
+                const type  = document.getElementById('endLocation').selectedOptions[0]?.dataset?.type;
+                const badge = document.getElementById('parkingBadge');
+                const map   = { free: ['badge-free', '✅ Free'], paid: ['badge-paid', '💰 Paid'], permit: ['badge-permit', '🔒 Permit Required'] };
+                const match = map[type];
+                badge.className = match ? `parking-badge ${match[0]}` : 'parking-badge badge-hidden';
+                badge.textContent = match ? match[1] : '';
+            }
 
-                // Popup vullen
-                const tot = data.route.duration_min;
-                let tv, tu;
-                if (tot >= 60) {
-                    const h = Math.floor(tot / 60), m = tot % 60;
-                    tv = m ? `${h}h ${m}` : `${h}`;
-                    tu = m ? 'hr min' : 'hr';
+            // --- Weer weergeven ---
+            function renderWeather(w, name) {
+                document.getElementById('weatherEmojiBig').textContent = wEmoji(w.weather_code);
+                document.getElementById('weatherName').textContent     = name;
+                document.getElementById('weatherContent').innerHTML    = `
+                    <div class="weather-stat"><div class="weather-stat-emoji">🌡️</div><div class="weather-stat-val">${w.temperature}°</div><div class="weather-stat-unit">Celsius</div><div class="weather-stat-label">Temperature</div></div>
+                    <div class="weather-stat"><div class="weather-stat-emoji">🌧️</div><div class="weather-stat-val">${w.rain_chance}%</div><div class="weather-stat-unit">Chance</div><div class="weather-stat-label">Rain probability</div></div>
+                    <div class="weather-stat"><div class="weather-stat-emoji">💨</div><div class="weather-stat-val">${w.wind_speed}</div><div class="weather-stat-unit">km/h</div><div class="weather-stat-label">Wind speed</div></div>`;
+                document.getElementById('weatherCard').style.display = 'block';
+
+                const rainAlert = document.getElementById('rainAlert');
+                if (w.rain_chance >= 50) {
+                    document.getElementById('rainChance').textContent = w.rain_chance;
+                    rainAlert.classList.add('active');
                 } else {
-                    tv = tot; tu = 'min';
+                    rainAlert.classList.remove('active');
                 }
-
-                document.getElementById('popupKm').textContent       = data.route.distance_km;
-                document.getElementById('popupTime').textContent     = tv;
-                document.getElementById('popupTimeUnit').textContent = tu;
-                document.getElementById('popupDest').textContent     = `📍 To: ${data.location.name}`;
-
-                if (dtVal) {
-                    const d = new Date(dtVal);
-                    document.getElementById('popupArrival').textContent =
-                        `🕐 Arriving: ${d.toLocaleString('en-GB', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}`;
-                }
-
-                document.getElementById('routePopup').classList.add('active');
-
-                // Weer tonen
-                if (data.weather && Object.keys(data.weather).length) {
-                    renderWeather(data.weather, data.location.name);
-                }
-
-            } catch (e) {
-                console.error(e);
-                alert('Er is iets misgegaan. Probeer opnieuw.');
-            } finally {
-                sp.classList.remove('active');
             }
-        }
 
-        function renderWeather(w, name) {
-            document.getElementById('weatherEmojiBig').textContent = wEmoji(w.weather_code);
-            document.getElementById('weatherName').textContent     = name;
-            document.getElementById('weatherContent').innerHTML    = `
-                <div class="weather-stat"><div class="weather-stat-emoji">🌡️</div><div class="weather-stat-val">${w.temperature}°</div><div class="weather-stat-unit">Celsius</div><div class="weather-stat-label">Temperature</div></div>
-                <div class="weather-stat"><div class="weather-stat-emoji">🌧️</div><div class="weather-stat-val">${w.rain_chance}%</div><div class="weather-stat-unit">Chance</div><div class="weather-stat-label">Rain probability</div></div>
-                <div class="weather-stat"><div class="weather-stat-emoji">💨</div><div class="weather-stat-val">${w.wind_speed}</div><div class="weather-stat-unit">km/h</div><div class="weather-stat-label">Wind speed</div></div>`;
-            document.getElementById('weatherCard').style.display = 'block';
+            // --- Route berekenen ---
+            async function calculateRoute() {
+                const addr  = document.getElementById('startLocation').value.trim();
+                const locId = document.getElementById('endLocation').value;
+                const dtVal = document.getElementById('arrivalTime').value;
 
-            const rainAlert = document.getElementById('rainAlert');
-            if (w.rain_chance >= 50) {
-                document.getElementById('rainChance').textContent = w.rain_chance;
-                rainAlert.classList.add('active');
-            } else {
-                rainAlert.classList.remove('active');
+                if (!addr || !locId) { alert('Vul zowel startlocatie als parking in'); return; }
+
+                const sp = document.getElementById('spinner');
+                sp.classList.add('active');
+
+                try {
+                    const res  = await fetch('/maps/route', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ address: addr, location_id: locId, arrival: dtVal }),
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok) { alert(data.error || 'Er ging iets mis.'); return; }
+
+                    // Oude lagen verwijderen en nieuwe zetten
+                    if (startM) map.removeLayer(startM);
+                    if (endM)   map.removeLayer(endM);
+                    if (routeL) map.removeLayer(routeL);
+
+                    startM = L.marker([data.start.lat, data.start.lng]).addTo(map).bindPopup('<strong>Start</strong>');
+                    endM   = L.marker([data.location.lat, data.location.lng], { icon: parkingIcon(data.location.type) }).addTo(map).bindPopup(`<strong>${data.location.name}</strong>`);
+                    routeL = L.polyline(data.route.coordinates.map(c => [c[1], c[0]]), { color: '#667eea', weight: 5 }).addTo(map);
+                    map.fitBounds(routeL.getBounds(), { padding: [50, 50] });
+
+                    // Popup vullen
+                    const tot = data.route.duration_min;
+                    const tv  = tot >= 60 ? `${Math.floor(tot/60)}h ${tot%60 ? tot%60 : ''}`.trim() : tot;
+                    const tu  = tot >= 60 ? (tot%60 ? 'hr min' : 'hr') : 'min';
+
+                    document.getElementById('popupKm').textContent       = data.route.distance_km;
+                    document.getElementById('popupTime').textContent     = tv;
+                    document.getElementById('popupTimeUnit').textContent = tu;
+                    document.getElementById('popupDest').textContent     = `📍 To: ${data.location.name}`;
+
+                    if (dtVal) {
+                        const d = new Date(dtVal);
+                        document.getElementById('popupArrival').textContent =
+                            `🕐 Arriving: ${d.toLocaleString('en-GB', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}`;
+                    }
+
+                    document.getElementById('routePopup').classList.add('active');
+
+                    if (data.weather && Object.keys(data.weather).length) renderWeather(data.weather, data.location.name);
+
+                } catch (e) {
+                    console.error(e);
+                    alert('Er is iets misgegaan. Probeer opnieuw.');
+                } finally {
+                    sp.classList.remove('active');
+                }
             }
-        }
 
-        document.getElementById('startLocation').addEventListener('keydown', e => { if (e.key === 'Enter') calculateRoute(); });
-</script>
-</body>
+            document.getElementById('startLocation').addEventListener('keydown', e => { if (e.key === 'Enter') calculateRoute(); });
+        </script>
+    </body>
 </html>

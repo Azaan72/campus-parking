@@ -5,16 +5,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
 Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
-Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
 
 Route::middleware('auth')->group(function () {
-Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
-Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
-Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
-Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
-Route::patch('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])
+    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+    Route::patch('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])
     ->name('reservations.cancel');
     // routes/web.php
-Route::middleware('auth')->get('/mijn-reserveringen', [ReservationController::class, 'history'])
+    Route::middleware('auth')->get('/mijn-reserveringen', [ReservationController::class, 'history'])
     ->name('reservations.history');
-});
+    });
+
+Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
