@@ -1,6 +1,7 @@
 <x-base-layout>
     <div class="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
         {{-- Header --}}
+        @auth
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Vehicles</h1>
             <a href="{{ route('vehicles.create') }}"
@@ -8,6 +9,7 @@
                 Add New Vehicle
             </a>
         </div>
+        @endauth
 
         {{-- Success message --}}
         @if(session('success'))
@@ -45,6 +47,7 @@
                                     View
                                 </a>
 
+                                @auth
                                 <a href="{{ route('vehicles.edit', $vehicle) }}"
                                    class="text-blue-600 hover:underline">
                                     Edit
@@ -60,9 +63,11 @@
                                         Delete
                                     </button>
                                 </form>
+                                @endauth
                             </td>
                         </tr>
                     @empty
+                    
                         <tr>
                             <td colspan="7" class="px-4 py-6 text-center text-gray-500">
                                 No vehicles found.
