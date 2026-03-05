@@ -3,10 +3,12 @@
         {{-- Header --}}
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Locations</h1>
+            @auth
             <a href="{{ route('locations.create') }}"
                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
                 Add New Location
             </a>
+            @endauth
         </div>
 
         {{-- Success message --}}
@@ -45,6 +47,7 @@
                                 Show
                             </a>
 
+                            @auth
                             {{-- Edit button --}}
                             <a href="{{ route('locations.edit', $location) }}"
                             class="text-yellow-600 hover:underline">
@@ -62,6 +65,7 @@
                                     Delete
                                 </button>
                             </form>
+                            @endauth
                         </td>
                     </tr>
                 @endforeach

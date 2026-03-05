@@ -13,6 +13,7 @@
 
         {{-- Actions --}}
         <div class="flex space-x-4 mb-6">
+            @auth
             <a href="{{ route('parkingspots.edit', $parkingspot->id) }}"
                 class="inline-block text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">
                 Bewerken
@@ -25,6 +26,7 @@
                     Verwijderen
                 </button>
             </form>
+            @endauth
         </div>
 
         {{-- Back link --}}

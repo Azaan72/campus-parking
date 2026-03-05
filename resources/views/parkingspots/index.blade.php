@@ -18,10 +18,12 @@
         {{-- Header --}}
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Parking Spots</h1>
+            @auth
             <a href="{{ route('parkingspots.create') }}"
                 class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
                 Add New Parking Spot
             </a>
+            @endauth
         </div>
 
         {{-- Success message --}}
@@ -51,6 +53,12 @@
                         <td class="px-4 py-2 border-b capitalize">{{ $spot->status }}</td>
                         <td class="px-4 py-2 border-b capitalize">{{ $spot->vehicle_fuel_type }}</td>
                         <td class="px-4 py-2 border-b text-center space-x-2">
+                            {{-- Show button --}}
+                           <a href="{{ route('parkingspots.show', $spot->id) }}"
+                           class="text-blue-600 hover:underline">
+                               Show
+                           </a>
+                            @auth
                             <a href="{{ route('parkingspots.edit', $spot->id) }}"
                                 class="text-blue-600 hover:underline">Edit</a>
 
@@ -59,6 +67,7 @@
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:underline">Delete</button>
                             </form>
+                            @endauth
                         </td>
                     </tr>
                     @empty

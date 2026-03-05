@@ -44,11 +44,12 @@
                class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition">
                 Back
             </a>
-
+            @auth
             <a href="{{ route('locations.edit', $location) }}"
                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
                 Edit
             </a>
+            @endauth
         </div>
     </div>
 </x-base-layout>
