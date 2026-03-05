@@ -9,6 +9,7 @@
             </a>
         </div>
 
+
         {{-- Success message --}}
         @if(session('success'))
             <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
@@ -53,7 +54,7 @@
                             </td>
 
                             <td class="px-4 py-2 border-b">
-                                {{ $reservation->user->name ?? 'N/A' }}
+                             {{ $reservation->user->firstname . ' ' . $reservation->user->lastname ?? 'N/A' }} 
                             </td>
 
                             <td class="px-4 py-2 border-b capitalize">
