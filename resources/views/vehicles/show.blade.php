@@ -47,6 +47,7 @@
             </div>
         </div>
 
+        @auth
         {{-- Actions --}}
         <div class="mt-8 flex justify-center space-x-4">
             <a href="{{ route('vehicles.edit', $vehicle) }}"
@@ -65,6 +66,7 @@
                     Delete
                 </button>
             </form>
+            @endauth
 
             <a href="{{ route('vehicles.index') }}"
                class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">

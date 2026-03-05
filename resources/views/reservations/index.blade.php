@@ -1,6 +1,7 @@
 <x-base-layout>
     <div class="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
         {{-- Header --}}
+        @auth
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">Reservations</h1>
             <a href="{{ route('reservations.create') }}"
@@ -8,7 +9,7 @@
                 Add New Reservation
             </a>
         </div>
-
+@endauth
 
         {{-- Success message --}}
         @if(session('success'))
@@ -65,12 +66,14 @@
                                 {{ $reservation->status_of_reservation }}
                             </td>
 
+
                             <td class="px-4 py-2 border-b text-center space-x-2">
                                 <a href="{{ route('reservations.show', $reservation) }}"
                                    class="text-indigo-600 hover:underline">
                                     View
                                 </a>
 
+                                @auth
                                 <a href="{{ route('reservations.edit', $reservation) }}"
                                    class="text-blue-600 hover:underline">
                                     Edit
@@ -86,6 +89,7 @@
                                         Delete
                                     </button>
                                 </form>
+                                @endauth
 
                                 @if($reservation->status_of_reservation !== 'cancelled' && \Carbon\Carbon::parse($reservation->date_time)->isFuture())
                                     <form action="{{ route('reservations.cancel', $reservation) }}"
