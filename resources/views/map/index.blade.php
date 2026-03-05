@@ -166,7 +166,6 @@
 <script>
     const map = L.map('map').setView([52.1,5.1],13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
-    const ORS_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjE1OTFjMDFlZDUyYjQzOWNiZGI2MjQxMDYxODQyYmUxIiwiaCI6Im11cm11cjY0In0=";
     let startM, endM, routeL;
     const pad = n => String(n).padStart(2,'0');
 
@@ -204,64 +203,101 @@
 
     function wEmoji(c){ return c===0?'☀️':c<=3?'⛅':c<=49?'🌫️':c<=67?'🌧️':c<=77?'❄️':c<=82?'🌦️':'⛈️'; }
 
-    async function fetchWeather(lat,lng,dtVal,name){
-        const dt=new Date(dtVal), ds=dt.toISOString().split('T')[0];
-        const b=new Date(dt); b.setDate(b.getDate()-1);
-        const a=new Date(dt); a.setDate(a.getDate()+1);
-        const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,precipitation_probability,weathercode,windspeed_10m&start_date=${b.toISOString().split('T')[0]}&end_date=${a.toISOString().split('T')[0]}&timezone=auto`;
-        const data=await(await fetch(url)).json();
-        const target=`${ds}T${pad(dt.getHours())}:00`;
-        let idx=data.hourly.time.findIndex(t=>t===target); if(idx<0) idx=dt.getHours();
-        const temp=data.hourly.temperature_2m[idx], rain=data.hourly.precipitation_probability[idx], wind=data.hourly.windspeed_10m[idx];
-        document.getElementById('weatherEmojiBig').textContent=wEmoji(data.hourly.weathercode[idx]);
-        document.getElementById('weatherName').textContent=name;
-        document.getElementById('weatherContent').innerHTML=`
-            <div class="weather-stat"><div class="weather-stat-emoji">🌡️</div><div class="weather-stat-val">${temp}°</div><div class="weather-stat-unit">Celsius</div><div class="weather-stat-label">Temperature</div></div>
-            <div class="weather-stat"><div class="weather-stat-emoji">🌧️</div><div class="weather-stat-val">${rain}%</div><div class="weather-stat-unit">Chance</div><div class="weather-stat-label">Rain probability</div></div>
-            <div class="weather-stat"><div class="weather-stat-emoji">💨</div><div class="weather-stat-val">${wind}</div><div class="weather-stat-unit">km/h</div><div class="weather-stat-label">Wind speed</div></div>`;
-        document.getElementById('weatherCard').style.display='block';
+    async function calculateRoute() {
+            const addr  = document.getElementById('startLocation').value.trim();
+            const sel   = document.getElementById('endLocation');
+            const locId = sel.value;
+            const dtVal = document.getElementById('arrivalTime').value;
 
-        // Show rain alert if 50% or more chance
-        const rainAlert = document.getElementById('rainAlert');
-        if(rain >= 50){
-            document.getElementById('rainChance').textContent = rain;
-            rainAlert.classList.add('active');
-        } else {
-            rainAlert.classList.remove('active');
-        }
-    }
+            if (!addr || !locId) { alert('Vul zowel startlocatie als parking in'); return; }
 
-    async function calculateRoute(){
-        const addr=document.getElementById('startLocation').value.trim();
-        const sel=document.getElementById('endLocation'), opt=sel.options[sel.selectedIndex], dtVal=document.getElementById('arrivalTime').value;
-        if(!addr||!opt?.dataset?.lat){alert('Vul zowel startlocatie als parking in');return;}
-        const sp=document.getElementById('spinner'); sp.classList.add('active');
-        try {
-            const gd=await(await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`)).json();
-            if(!gd.length){alert('Startadres niet gevonden');return;}
-            const sLat=parseFloat(gd[0].lat),sLng=parseFloat(gd[0].lon),eLat=parseFloat(opt.dataset.lat),eLng=parseFloat(opt.dataset.lng);
-            if(startM) map.removeLayer(startM); if(endM) map.removeLayer(endM); if(routeL) map.removeLayer(routeL);
-            startM=L.marker([sLat,sLng]).addTo(map).bindPopup('<strong>Start</strong>');
-            endM=L.marker([eLat,eLng],{icon:parkingIcon(opt.dataset.type)}).addTo(map).bindPopup(`<strong>${opt.text.trim()}</strong>`);
-            const rd=await(await fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=${ORS_KEY}&start=${sLng},${sLat}&end=${eLng},${eLat}`)).json();
-            if(rd.features){
-                routeL=L.polyline(rd.features[0].geometry.coordinates.map(c=>[c[1],c[0]]),{color:'#667eea',weight:5}).addTo(map);
-                map.fitBounds(routeL.getBounds(),{padding:[50,50]});
-                const s=rd.features[0].properties.summary, km=(s.distance/1000).toFixed(1), tot=Math.round(s.duration/60);
-                let tv,tu; if(tot>=60){const h=Math.floor(tot/60),m=tot%60;tv=m?`${h}h ${m}`:`${h}`;tu=m?'hr min':'hr';}else{tv=tot;tu='min';}
-                document.getElementById('popupKm').textContent=km;
-                document.getElementById('popupTime').textContent=tv;
-                document.getElementById('popupTimeUnit').textContent=tu;
-                document.getElementById('popupDest').textContent=`📍 To: ${opt.text.trim()}`;
-                if(dtVal){const d=new Date(dtVal);document.getElementById('popupArrival').textContent=`🕐 Arriving: ${d.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;}
+            const sp = document.getElementById('spinner');
+            sp.classList.add('active');
+
+            try {
+                const res = await fetch('/maps/route', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ address: addr, location_id: locId, arrival: dtVal }),
+                });
+
+                const data = await res.json();
+                if (!res.ok) { alert(data.error || 'Er ging iets mis.'); return; }
+
+                // Verwijder oude lagen
+                if (startM) map.removeLayer(startM);
+                if (endM)   map.removeLayer(endM);
+                if (routeL) map.removeLayer(routeL);
+
+                // Zet markers
+                startM = L.marker([data.start.lat, data.start.lng])
+                        .addTo(map).bindPopup('<strong>Start</strong>');
+                endM   = L.marker([data.location.lat, data.location.lng], { icon: parkingIcon(data.location.type) })
+                        .addTo(map).bindPopup(`<strong>${data.location.name}</strong>`);
+
+                // Teken route
+                routeL = L.polyline(data.route.coordinates.map(c => [c[1], c[0]]), { color: '#667eea', weight: 5 }).addTo(map);
+                map.fitBounds(routeL.getBounds(), { padding: [50, 50] });
+
+                // Popup vullen
+                const tot = data.route.duration_min;
+                let tv, tu;
+                if (tot >= 60) {
+                    const h = Math.floor(tot / 60), m = tot % 60;
+                    tv = m ? `${h}h ${m}` : `${h}`;
+                    tu = m ? 'hr min' : 'hr';
+                } else {
+                    tv = tot; tu = 'min';
+                }
+
+                document.getElementById('popupKm').textContent       = data.route.distance_km;
+                document.getElementById('popupTime').textContent     = tv;
+                document.getElementById('popupTimeUnit').textContent = tu;
+                document.getElementById('popupDest').textContent     = `📍 To: ${data.location.name}`;
+
+                if (dtVal) {
+                    const d = new Date(dtVal);
+                    document.getElementById('popupArrival').textContent =
+                        `🕐 Arriving: ${d.toLocaleString('en-GB', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}`;
+                }
+
                 document.getElementById('routePopup').classList.add('active');
-                if(dtVal) fetchWeather(eLat,eLng,dtVal,opt.text.trim());
-            } else alert('Could not calculate route.');
-        } catch(e){console.error(e);alert('Something went wrong. Please try again.');}
-        finally{sp.classList.remove('active');}
-    }
 
-    document.getElementById('startLocation').addEventListener('keydown',e=>{if(e.key==='Enter')calculateRoute();});
+                // Weer tonen
+                if (data.weather && Object.keys(data.weather).length) {
+                    renderWeather(data.weather, data.location.name);
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert('Er is iets misgegaan. Probeer opnieuw.');
+            } finally {
+                sp.classList.remove('active');
+            }
+        }
+
+        function renderWeather(w, name) {
+            document.getElementById('weatherEmojiBig').textContent = wEmoji(w.weather_code);
+            document.getElementById('weatherName').textContent     = name;
+            document.getElementById('weatherContent').innerHTML    = `
+                <div class="weather-stat"><div class="weather-stat-emoji">🌡️</div><div class="weather-stat-val">${w.temperature}°</div><div class="weather-stat-unit">Celsius</div><div class="weather-stat-label">Temperature</div></div>
+                <div class="weather-stat"><div class="weather-stat-emoji">🌧️</div><div class="weather-stat-val">${w.rain_chance}%</div><div class="weather-stat-unit">Chance</div><div class="weather-stat-label">Rain probability</div></div>
+                <div class="weather-stat"><div class="weather-stat-emoji">💨</div><div class="weather-stat-val">${w.wind_speed}</div><div class="weather-stat-unit">km/h</div><div class="weather-stat-label">Wind speed</div></div>`;
+            document.getElementById('weatherCard').style.display = 'block';
+
+            const rainAlert = document.getElementById('rainAlert');
+            if (w.rain_chance >= 50) {
+                document.getElementById('rainChance').textContent = w.rain_chance;
+                rainAlert.classList.add('active');
+            } else {
+                rainAlert.classList.remove('active');
+            }
+        }
+
+        document.getElementById('startLocation').addEventListener('keydown', e => { if (e.key === 'Enter') calculateRoute(); });
 </script>
 </body>
 </html>
