@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Reservation;
 use App\Models\ParkingSpot;
 use App\Models\Vehicle;
@@ -80,18 +82,28 @@ class ReservationController extends Controller
 
 
 
-   public function cancel(Reservation $reservation)
-{
-    if (\Carbon\Carbon::parse($reservation->date_time)->isPast()) {
-        return back()->with('error', 'Je kan een reservering niet annuleren na de ingangsdatum.');
+    public function cancel(Reservation $reservation)
+    {
+        if (\Carbon\Carbon::parse($reservation->date_time)->isPast()) {
+            return back()->with('error', 'Je kan een reservering niet annuleren na de ingangsdatum.');
+        }
+
+        $reservation->update(['status_of_reservation' => 'cancelled']);
+
+        if ($reservation->parkingSpot) {
+            $reservation->parkingSpot->update(['is_available' => true]);
+        }
+
+        return back()->with('success', 'Reservering succesvol geannuleerd.');
     }
 
-    $reservation->update(['status_of_reservation' => 'cancelled']);
+    public function history()
+    {
+        $reservations = Reservation::with(['parkingSpot', 'vehicle'])
+            ->where('user_id', Auth::id())
+            ->orderBy('date_time', 'desc')
+            ->paginate(10);
 
-    if ($reservation->parkingSpot) {
-        $reservation->parkingSpot->update(['is_available' => true]);
+        return view('reservations.history', compact('reservations'));
     }
-
-    return back()->with('success', 'Reservering succesvol geannuleerd.');
-}
 }
