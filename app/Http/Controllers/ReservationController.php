@@ -41,20 +41,20 @@ class ReservationController extends Controller
         return view('reservations.edit', compact('reservation', 'parkingSpots', 'vehicles', 'users'));
     }
 
-    public function store(Request $request)
-    {
-        $reservation = Reservation::create([
-            'status_of_reservation' => $request->input('status_of_reservation'),
-            'date_time' => $request->input('date_time'),
-            'type_reservation' => $request->input('type_reservation'),
-            'user_id' => $request->input('user_id'),
-            'parking_spot_id' => $request->input('parking_spot_id'),
-            'vehicle_id' => $request->input('vehicle_id'),
-        ]);
+public function store(Request $request)
+{
+    $reservation = Reservation::create([
+        'status_of_reservation' => $request->input('status_of_reservation'),
+        'date_time'             => $request->input('date_time'),
+        'type_reservation'      => $request->input('type_reservation'),
+        'user_id'               => auth()->id(), // ✅ altijd ingelogde gebruiker
+        'parking_spot_id'       => $request->input('parking_spot_id'),
+        'vehicle_id'            => $request->input('vehicle_id'),
+    ]);
 
-        return redirect()->route('reservations.index')
-            ->with('success', 'Reservation succesvol aangemaakt.');
-    }
+    return redirect()->route('reservations.index')
+        ->with('success', 'Reservation succesvol aangemaakt.');
+}
 
 
     public function update(Request $request, Reservation $reservation)
