@@ -47,21 +47,7 @@
                 </select>
             </div>
 
-                    {{-- User Dropdown --}}
-            <div>
-                <label class="block font-semibold mb-1">User</label>
-                <select name="user_id"
-                        class="w-full border border-gray-300 rounded px-3 py-2"
-                        required>
-                    <option value="">-- Select User --</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}"
-                            @selected(old('user_id') == $user->id)>
-                            {{ $user->firstname }} {{ $user->lastname }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+     
 
             {{-- Reservation Type --}}
             <div>
