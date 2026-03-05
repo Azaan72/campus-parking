@@ -6,32 +6,73 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ __('Register an account') }}</h1>
             </div>
 
-            <form method="POST" action="{{ route('register') }}" class="space-y-3">
-                @csrf
-                <!-- Full Name Input -->
-                <div>
-                    <x-forms.input label="Full Name" name="name" type="text" placeholder="{{ __('Full Name') }}" autofocus />
-                </div>
+                <form method="POST" action="{{ route('register') }}" class="space-y-3">
+                    @csrf
 
-                <!-- Email Input -->
-                <div>
-                    <x-forms.input label="Email" name="email" type="email" placeholder="your@email.com" />
-                </div>
+                    <!-- First Name -->
+                    <div>
+                        <x-forms.input 
+                            label="First Name" 
+                            name="firstname" 
+                            type="text" 
+                            placeholder="John" 
+                            :value="old('firstname')" 
+                            required 
+                            autofocus 
+                        />
+                    </div>
 
-                <!-- Password Input -->
-                <div>
-                    <x-forms.input label="Password" name="password" type="password" placeholder="••••••••" />
-                </div>
+                    <!-- Last Name -->
+                    <div>
+                        <x-forms.input 
+                            label="Last Name" 
+                            name="lastname" 
+                            type="text" 
+                            placeholder="Doe" 
+                            :value="old('lastname')" 
+                            required 
+                        />
+                    </div>
 
-                <!-- Confirm Password Input -->
-                <div>
-                    <x-forms.input label="Confirm Password" name="password_confirmation" type="password"
-                        placeholder="••••••••" />
-                </div>
+                    <!-- Email -->
+                    <div>
+                        <x-forms.input 
+                            label="Email" 
+                            name="email" 
+                            type="email" 
+                            placeholder="your@email.com" 
+                            :value="old('email')" 
+                            required 
+                        />
+                    </div>
 
-                <!-- Register Button -->
-                <x-button type="primary" class="w-full">{{ __('Create Account') }}</x-button>
-            </form>
+                    <!-- Password -->
+                    <div>
+                        <x-forms.input 
+                            label="Password" 
+                            name="password" 
+                            type="password" 
+                            placeholder="••••••••" 
+                            required 
+                        />
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <x-forms.input 
+                            label="Confirm Password" 
+                            name="password_confirmation" 
+                            type="password"
+                            placeholder="••••••••" 
+                            required 
+                        />
+                    </div>
+
+                    <!-- Register Button -->
+                    <x-button type="primary" class="w-full">
+                        {{ __('Create Account') }}
+                    </x-button>
+                </form>
 
             <!-- Login Link -->
             <div class="text-center mt-6">
