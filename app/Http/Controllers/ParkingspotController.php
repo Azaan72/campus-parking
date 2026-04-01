@@ -27,7 +27,8 @@ class ParkingspotController extends Controller
 
     public function create()
     {
-        return view('parkingspots.create');
+        $locations = Parkingspot::distinct()->pluck('location');
+        return view('parkingspots.create', compact('locations'));
     }
 
     // STORE
@@ -61,8 +62,8 @@ class ParkingspotController extends Controller
 
     public function edit(Parkingspot $parkingspot)
     {
-
-        return view('parkingspots.edit')->with('status', 'Parkingspot succesvol bijgewerkt.')->with('parkingspot', $parkingspot);
+        $locations = Parkingspot::distinct()->pluck('location');
+        return view('parkingspots.edit', compact('locations', 'parkingspot'));
     }
 
     public function destroy($id)

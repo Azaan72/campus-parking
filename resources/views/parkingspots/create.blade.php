@@ -7,7 +7,12 @@
         {{-- Location --}}
         <div>
             <label class="block font-semibold">Location</label>
-            <input type="text" name="location" class="border rounded w-full p-2" placeholder="Verdieping -1, Zone A, P1" required>
+            <select name="location" class="border rounded w-full p-2" required>
+                <option value="" disabled selected>Selecteer een locatie</option>
+                @foreach($locations as $location)
+                    <option value="{{ $location }}">{{ $location }}</option>
+                @endforeach
+            </select>
         </div>
 
         {{-- Type --}}
