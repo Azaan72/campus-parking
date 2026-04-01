@@ -128,7 +128,7 @@
                 <span id="parkingBadge" class="parking-badge badge-hidden"></span>
             </div>
             <div>
-                <label>📅 Arrival Date &amp; Time</label>
+                <label> Arrival Date &amp; Time</label>
                 <input type="datetime-local" id="arrivalTime">
             </div>
             <div style="display:flex;align-items:flex-end;">
