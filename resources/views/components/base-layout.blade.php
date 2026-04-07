@@ -41,6 +41,10 @@
                 class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-950 font-semibold shadow-xl hover:scale-105 hover:shadow-2xl transition duration-300">
                     Parking Spots
                 </a>
+                    <a href="{{ route('vehicles.index') }}"
+                    class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-950 font-semibold shadow-xl hover:scale-105 hover:shadow-2xl transition duration-300">
+                    Vehicles
+                </a>
 
             <nav class="flex gap-4">
                 <a href="{{ route('reservations.index') }}"

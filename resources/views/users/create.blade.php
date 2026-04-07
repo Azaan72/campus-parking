@@ -135,4 +135,14 @@
             Add User
         </button>
     </form>
+
+    @if ($errors->any())
+    <div class="bg-red-100 p-3 mb-4">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 </x-base-layout>
